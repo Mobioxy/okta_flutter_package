@@ -2,7 +2,7 @@ PODS:
   - Flutter (1.0.0)
   - okta_flutter (0.0.1):
     - Flutter
-    - OktaOidc
+    - OktaOidc (= 3.11.2)
   - OktaOidc (3.11.2):
     - OktaOidc/AppAuth (= 3.11.2)
     - OktaOidc/Okta (= 3.11.2)
@@ -26,7 +26,7 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   Flutter: 50d75fe2f02b26cc09d224853bb45737f8b3214a
-  okta_flutter: c5348a1538c1f625389dc5e6453ca12c60fad816
+  okta_flutter: 6efaabfb9467de70c15b3336a2701bdea176e567
   OktaOidc: 15fb3d494103d4f07ba8a523b3347d02c4d30486
 
 PODFILE CHECKSUM: 8e679eca47255a8ca8067c4c67aab20e64cb974d
