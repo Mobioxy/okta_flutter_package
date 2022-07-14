@@ -1,3 +1,8 @@
-## 0.0.1
+## 0.0.2
 
-* TODO: Describe initial release.
+* TODO: Okata sign in auth added.
+
+
+## 0.0.3
+
+* TODO: Okata sign out for android.
