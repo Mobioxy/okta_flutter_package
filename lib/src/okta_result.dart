@@ -15,6 +15,6 @@ class OktaResult {
 
   @override
   String toString() {
-    return 'OktaResult(tatus: $status, message: $message)';
+    return 'OktaResult(status: $status, message: $message)';
   }
 }
