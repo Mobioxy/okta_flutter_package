@@ -21,7 +21,7 @@ class _MyAppState extends State<MyApp> {
     var config = OktaConfig(
       clientId: '0oa5r05zy5BV26wcQ5d7',
       discoveryUri: ' https://dev-03370337-admin.okta.com:/oauth2/default',
-      redirectUri: 'com.mobioxy.okta_flutter_example',
+      redirectUri: 'com.okta.dev-03370337:/callback',
       endSessionRedirectUri: ' https://dev-03370337-admin.okta.com:/',
       scopes: ['openid', 'profile', 'email'],
     );
