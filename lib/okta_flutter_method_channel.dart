@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:okta_flutter/src/okta_config.dart';
@@ -13,8 +15,9 @@ class MethodChannelOktaFlutter extends OktaFlutterPlatform {
 
   @override
   Future<bool?> createOIDCConfig(OktaConfig config) {
-    return methodChannel.invokeMethod<bool?>(
-        'createOIDCConfig', config.toMap());
+    var arguments =
+        Platform.isIOS ? config.toIOSConfig() : config.toAndroidConfig();
+    return methodChannel.invokeMethod<bool?>('createOIDCConfig', arguments);
   }
 
   @override

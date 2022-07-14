@@ -43,7 +43,7 @@ class OktaService {
 
             return true
         } catch (e: Exception) {
-            Log.d(tag, "OktaService initialization Failed: ${e.message}")
+            Log.d(tag, "OktaService initialization failed: ${e.message}")
             return false
         }
     }
@@ -53,7 +53,6 @@ class OktaService {
 
         try {
             val payload = AuthenticationPayload.Builder()
-                .setLoginHint("Login with Okta")
                 .build()
 
             authClient?.signIn(activity, payload)
@@ -85,7 +84,7 @@ class OktaService {
                 }, activity
             )
         } catch (e: Exception) {
-            Log.d(tag, "OktaService Error: ${e.message}")
+            Log.d(tag, "OktaService error: ${e.message}")
             response["authorizationStatus"] = AuthorizationStatus.ERROR.name
             response["message"] = e.message
             oktaResult.onResult(response)

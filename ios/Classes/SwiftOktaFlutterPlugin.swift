@@ -3,13 +3,43 @@ import UIKit
 import OktaOidc
 
 public class SwiftOktaFlutterPlugin: NSObject, FlutterPlugin {
-  public static func register(with registrar: FlutterPluginRegistrar) {
-    let channel = FlutterMethodChannel(name: "okta_flutter", binaryMessenger: registrar.messenger())
-    let instance = SwiftOktaFlutterPlugin()
-    registrar.addMethodCallDelegate(instance, channel: channel)
-  }
-
-  public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
-    result("iOS " + UIDevice.current.systemVersion)
-  }
+    
+    private var oktaService = OktaService()
+    
+    public static func register(with registrar: FlutterPluginRegistrar) {
+        let channel = FlutterMethodChannel(name: "mobility.okta_flutter", binaryMessenger: registrar.messenger())
+        let instance = SwiftOktaFlutterPlugin()
+        registrar.addMethodCallDelegate(instance, channel: channel)
+    }
+    
+    public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
+        if call.method == "createOIDCConfig" {
+            
+            if let arguments = call.arguments as? Dictionary<String, Any>{
+                let configuration = processOIDCConfigArguments(arguments: arguments)
+                oktaService.createOIDCConfig(configuration: configuration)
+            }
+            
+        } else if call.method == "open" {
+            
+            let viewController = UIApplication.shared.keyWindow?.rootViewController ?? UIViewController()
+            oktaService.open(from: viewController) { oktaResult in
+                result(oktaResult)
+            }
+            
+            
+        }  else {
+            result(FlutterMethodNotImplemented)
+        }
+    }
+    
+    func processOIDCConfigArguments(arguments : Dictionary<String, Any>) ->  OktaOidcConfig? {
+        return try? OktaOidcConfig(with: [
+            "issuer": (arguments["discoveryUri"] as? String) ?? "",
+            "clientId": (arguments["clientId"] as? String) ?? "",
+            "redirectUri": (arguments["redirectUri"] as? String) ?? "",
+            "logoutRedirectUri": (arguments["endSessionRedirectUri"] as? String) ?? "",
+            "scopes": (arguments["scopes"] as? String) ?? ""
+        ])
+    }
 }

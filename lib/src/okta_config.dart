@@ -13,13 +13,23 @@ class OktaConfig {
   final String discoveryUri;
   final List<String> scopes;
 
-  Map<String, dynamic> toMap() {
+  Map<String, dynamic> toAndroidConfig() {
     return {
       'clientId': clientId,
       'redirectUri': redirectUri,
       'endSessionRedirectUri': endSessionRedirectUri,
       'discoveryUri': discoveryUri,
       'scopes': scopes,
+    };
+  }
+
+  Map<String, dynamic> toIOSConfig() {
+    return {
+      'clientId': clientId,
+      'redirectUri': redirectUri,
+      'endSessionRedirectUri': endSessionRedirectUri,
+      'discoveryUri': discoveryUri,
+      'scopes': scopes.join(' '),
     };
   }
 }
