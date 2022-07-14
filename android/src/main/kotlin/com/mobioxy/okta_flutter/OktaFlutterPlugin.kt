@@ -47,8 +47,16 @@ class OktaFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
                     result.success(false)
                 }
             }
-            "open" -> {
-                oktaService.open(binding.activity,
+            "signIn" -> {
+                oktaService.signIn(binding.activity,
+                    object : OktaService.OktaResultHandler {
+                        override fun onResult(oktaResult: MutableMap<String, Any?>) {
+                            result.success(oktaResult)
+                        }
+                    })
+            }
+            "signOut" -> {
+                oktaService.signOut(binding.activity,
                     object : OktaService.OktaResultHandler {
                         override fun onResult(oktaResult: MutableMap<String, Any?>) {
                             result.success(oktaResult)

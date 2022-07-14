@@ -27,5 +27,7 @@ abstract class OktaFlutterPlatform extends PlatformInterface {
 
   Future<bool?> createOIDCConfig(OktaConfig config);
 
-  Future<OktaResult> open();
+  Future<OktaResult> signIn();
+
+  Future<OktaResult> signOut();
 }
