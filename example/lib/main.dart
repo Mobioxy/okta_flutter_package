@@ -20,9 +20,9 @@ class _MyAppState extends State<MyApp> {
   Future<void> _oktaAuthenticationHandler() async {
     var config = OktaConfig(
       clientId: '0oa5r05zy5BV26wcQ5d7',
-      discoveryUri: ' https://dev-03370337-admin.okta.com:/oauth2/default',
+      discoveryUri: 'https://dev-03370337-admin.okta.com:/oauth2/default',
       redirectUri: 'com.okta.dev-03370337:/callback',
-      endSessionRedirectUri: ' https://dev-03370337-admin.okta.com:/',
+      endSessionRedirectUri: 'https://dev-03370337-admin.okta.com:/',
       scopes: ['openid', 'profile', 'email'],
     );
     var status = await _okta.createOIDCConfig(config);
