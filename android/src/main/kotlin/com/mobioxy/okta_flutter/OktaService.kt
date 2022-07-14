@@ -2,10 +2,10 @@ package com.mobioxy.okta_flutter
 
 import android.app.Activity
 import android.content.Context
+import android.content.Intent
 import android.util.Log
 import com.okta.oidc.*
 import com.okta.oidc.clients.web.WebAuthClient
-import com.okta.oidc.results.Result
 import com.okta.oidc.storage.SharedPreferenceStorage
 import com.okta.oidc.storage.security.DefaultEncryptionManager
 import com.okta.oidc.util.AuthorizationException
@@ -90,5 +90,9 @@ class OktaService {
             response["message"] = e.message
             oktaResult.onResult(response)
         }
+    }
+
+    fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        authClient?.handleActivityResult(requestCode, resultCode, data)
     }
 }
