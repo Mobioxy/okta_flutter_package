@@ -4,20 +4,17 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.util.Log
-import com.okta.oidc.AuthorizationStatus
-import com.okta.oidc.OIDCConfig
-import com.okta.oidc.Okta.WebAuthBuilder
-import com.okta.oidc.ResultCallback
+import com.okta.oidc.*
 import com.okta.oidc.clients.web.WebAuthClient
 import com.okta.oidc.storage.SharedPreferenceStorage
+import com.okta.oidc.storage.security.DefaultEncryptionManager
 import com.okta.oidc.util.AuthorizationException
-import java.lang.Exception
 
 
 class OktaService {
 
     private var config: OIDCConfig? = null
-    private var webClient: WebAuthClient? = null
+    private var authClient: WebAuthClient? = null
 
     var tag: String = this.javaClass.simpleName
 
@@ -35,11 +32,14 @@ class OktaService {
                 .discoveryUri(baseConfig.discoveryUri)
                 .create()
 
-            webClient = WebAuthBuilder()
+            authClient = Okta.WebAuthBuilder()
                 .withConfig(config!!)
                 .withContext(context)
                 .withStorage(SharedPreferenceStorage(context))
-                .create()
+                .withEncryptionManager(DefaultEncryptionManager(context))
+                .setRequireHardwareBackedKeyStore(false)
+                .withCallbackExecutor(null)
+                .create();
 
             return true
         } catch (e: Exception) {
@@ -52,8 +52,12 @@ class OktaService {
         val response: MutableMap<String, Any?> = HashMap()
 
         try {
-            Log.d(tag, "OktaService Started")
-            webClient?.registerCallback(
+            val payload = AuthenticationPayload.Builder()
+                .setLoginHint("Login with Okta")
+                .build()
+
+            authClient?.signIn(activity, payload)
+            authClient?.registerCallback(
                 object : ResultCallback<AuthorizationStatus, AuthorizationException> {
                     override fun onSuccess(result: AuthorizationStatus) {
                         Log.d(tag, "onSuccess: ${result.name}")
@@ -72,10 +76,10 @@ class OktaService {
                     }
 
                     override fun onError(msg: String?, exception: AuthorizationException?) {
-                        Log.d(tag, "onError: $msg")
+                        Log.d(tag, "onError: ${exception?.message}")
 
                         response["authorizationStatus"] = AuthorizationStatus.ERROR.name
-                        response["message"] = msg
+                        response["message"] = "$msg : ${exception?.message}"
                         oktaResult.onResult(response)
                     }
                 }, activity
@@ -89,6 +93,6 @@ class OktaService {
     }
 
     fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        webClient?.handleActivityResult(requestCode, resultCode, data)
+        authClient?.handleActivityResult(requestCode, resultCode, data)
     }
 }

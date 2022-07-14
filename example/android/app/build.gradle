@@ -52,7 +52,7 @@ android {
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
         manifestPlaceholders = [
-            "appAuthRedirectScheme": "com.mobioxy.okta_flutter_example"
+            "appAuthRedirectScheme": "com.okta.dev-03370337"
         ]
     }
 
