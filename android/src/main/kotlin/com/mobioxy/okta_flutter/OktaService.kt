@@ -10,7 +10,6 @@ import com.okta.oidc.storage.SharedPreferenceStorage
 import com.okta.oidc.storage.security.DefaultEncryptionManager
 import com.okta.oidc.util.AuthorizationException
 
-
 class OktaService {
 
     private var config: OIDCConfig? = null
@@ -48,50 +47,87 @@ class OktaService {
         }
     }
 
-    fun open(activity: Activity, oktaResult: OktaResultHandler) {
+    fun signIn(activity: Activity, oktaResult: OktaResultHandler) {
         val response: MutableMap<String, Any?> = HashMap()
 
-        try {
-            val payload = AuthenticationPayload.Builder()
-                .build()
+        val payload = AuthenticationPayload.Builder()
+            .build()
 
-            authClient?.signIn(activity, payload)
-            authClient?.registerCallback(
-                object : ResultCallback<AuthorizationStatus, AuthorizationException> {
-                    override fun onSuccess(result: AuthorizationStatus) {
-                        Log.d(tag, "onSuccess: ${result.name}")
+        authClient?.signIn(activity, payload)
+        authClient?.registerCallback(
+            object : ResultCallback<AuthorizationStatus, AuthorizationException> {
+                override fun onSuccess(result: AuthorizationStatus) {
+                    Log.d(tag, "onSuccess: ${result.name}")
 
-                        response["authorizationStatus"] = result.name
-                        response["message"] = "Success"
-                        oktaResult.onResult(response)
-                    }
+                    response["authorizationStatus"] = result.name
+                    response["message"] = "Success"
+                    oktaResult.onResult(response)
+                }
 
-                    override fun onCancel() {
-                        Log.d(tag, "onCancel")
+                override fun onCancel() {
+                    Log.d(tag, "onCancel")
 
-                        response["authorizationStatus"] = AuthorizationStatus.CANCELED.name
-                        response["message"] = "Cancelled by User"
-                        oktaResult.onResult(response)
-                    }
+                    response["authorizationStatus"] = AuthorizationStatus.CANCELED.name
+                    response["message"] = "Cancelled by User"
+                    oktaResult.onResult(response)
+                }
 
-                    override fun onError(msg: String?, exception: AuthorizationException?) {
-                        Log.d(tag, "onError: ${exception?.message}")
+                override fun onError(msg: String?, exception: AuthorizationException?) {
+                    Log.d(tag, "onError: ${exception?.message}")
 
-                        response["authorizationStatus"] = AuthorizationStatus.ERROR.name
-                        response["message"] = "$msg : ${exception?.message}"
-                        oktaResult.onResult(response)
-                    }
-                }, activity
-            )
-        } catch (e: Exception) {
-            Log.d(tag, "OktaService error: ${e.message}")
-            response["authorizationStatus"] = AuthorizationStatus.ERROR.name
-            response["message"] = e.message
-            oktaResult.onResult(response)
+                    response["authorizationStatus"] = AuthorizationStatus.ERROR.name
+                    response["message"] = "$msg : ${exception?.message}"
+                    oktaResult.onResult(response)
+                }
+            }, activity
+        )
+    }
+
+    fun signOut(activity: Activity, oktaResult: OktaResultHandler) {
+        val response: MutableMap<String, Any?> = HashMap()
+        authClient?.signOut(activity, object : RequestCallback<Int, AuthorizationException> {
+            override fun onSuccess(result: Int) {
+                Log.d(tag, "onSuccess: $result")
+
+                response["authorizationStatus"] = handleSignOutResult(result)
+                response["message"] = "Success"
+                oktaResult.onResult(response)
+            }
+
+            override fun onError(error: String?, exception: AuthorizationException?) {
+                Log.d(tag, "onError: ${exception?.message}")
+
+                response["authorizationStatus"] = AuthorizationStatus.ERROR.name
+                response["message"] = "$error : ${exception?.message}"
+                oktaResult.onResult(response)
+            }
+
         }
+        )
     }
 
     fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         authClient?.handleActivityResult(requestCode, resultCode, data)
+    }
+
+    private fun handleSignOutResult(result: Int): String {
+        return when (result) {
+            0x00000000 -> {
+                "SUCCESS"
+            }
+            0x00000001 -> {
+                "FAILED_REVOKE_ACCESS_TOKEN"
+            }
+            0x00000002 -> {
+                "FAILED_REVOKE_REFRESH_TOKEN"
+            }
+            0x00000004 -> {
+                "FAILED_CLEAR_DATA"
+            }
+            0x00000008 -> {
+                "FAILED_CLEAR_SESSION"
+            }
+            else -> AuthorizationStatus.ERROR.name
+        }
     }
 }

@@ -21,8 +21,15 @@ class MethodChannelOktaFlutter extends OktaFlutterPlatform {
   }
 
   @override
-  Future<OktaResult> open() {
-    return methodChannel.invokeMethod('open').then((result) {
+  Future<OktaResult> signIn() {
+    return methodChannel.invokeMethod('signIn').then((result) {
+      return OktaResult.fromMap(Map<String, dynamic>.from(result));
+    });
+  }
+
+  @override
+  Future<OktaResult> signOut() {
+    return methodChannel.invokeMethod('signOut').then((result) {
       return OktaResult.fromMap(Map<String, dynamic>.from(result));
     });
   }

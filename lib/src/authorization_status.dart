@@ -1,10 +1,55 @@
+/// The Authorization status returned from a auth requests.
+///
 enum AuthorizationStatus {
+  /// Authorized authorization status. User is authorized. Received access, refresh, and ID tokens/
+  ///
   authorized,
+
+  /// Signed out authorization status. Browser session is cleared.
+  ///
   signedOut,
+
+  /// Operation was canceled.
+  ///
   canceled,
+
+  /// Operation resulted in an exception.
+  ///
   error,
+
+  /// Email verified and user is authenticated with a valid browser session but the user is not
+  /// authorized so it won't have any valid tokens.
+  /// To complete the code exchange, client's should call `signIn()` again.
+  /// Since the user already have a valid browser session(AUTHENTICATED), they are not required to enter any credentials.
+  ///
   emailVerificationAuthenticated,
-  emailVerificationUnauthenticated
+
+  /// Email verified but user is not authenticated.
+  /// To complete the code exchange, client's should call `signIn()` again.
+  /// Since the user is not authenticated they are required to enter credentials.
+  /// It is good practice to set the login hint in the payload so users don't have to enter it again.
+  ///
+  emailVerificationUnauthenticated,
+
+  /// Status returned when sign out steps have all completed.
+  ///
+  success,
+
+  /// Bitwise status returned when clearing browser failed.
+  ///
+  failedRevokeAccessToken,
+
+  /// Bitwise status returned when revoking access token failed.
+  ///
+  failedRevokeRefreshToken,
+
+  /// Bitwise status returned when revoking refresh token failed.
+  ///
+  failedClearData,
+
+  /// Bitwise status returned when clearing data failed.
+  ///
+  failedClearSession,
 }
 
 AuthorizationStatus? getAuthorizationStatus(String status) {
@@ -17,6 +62,11 @@ AuthorizationStatus? getAuthorizationStatus(String status) {
         AuthorizationStatus.emailVerificationAuthenticated,
     'EMAIL_VERIFICATION_UNAUTHENTICATED':
         AuthorizationStatus.emailVerificationUnauthenticated,
+    'SUCCESS': AuthorizationStatus.success,
+    'FAILED_REVOKE_ACCESS_TOKEN': AuthorizationStatus.failedRevokeAccessToken,
+    'FAILED_REVOKE_REFRESH_TOKEN': AuthorizationStatus.failedRevokeRefreshToken,
+    'FAILED_CLEAR_DATA': AuthorizationStatus.failedClearData,
+    'FAILED_CLEAR_SESSION': AuthorizationStatus.failedClearSession,
   };
   return authorizationStatus[status];
 }
