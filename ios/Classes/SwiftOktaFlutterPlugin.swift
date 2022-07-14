@@ -20,10 +20,10 @@ public class SwiftOktaFlutterPlugin: NSObject, FlutterPlugin {
                 oktaService.createOIDCConfig(configuration: configuration)
             }
             
-        } else if call.method == "open" {
+        } else if call.method == "signIn" {
             
             let viewController = UIApplication.shared.keyWindow?.rootViewController ?? UIViewController()
-            oktaService.open(from: viewController) { oktaResult in
+            oktaService.signIn(from: viewController) { oktaResult in
                 result(oktaResult)
             }
             

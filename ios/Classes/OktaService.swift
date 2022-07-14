@@ -26,7 +26,7 @@ public class OktaService : NSObject {
         }
     }
     
-    func open(from: UIViewController, oktaResult : @escaping ([String : Any]) -> Void) {
+    func signIn(from: UIViewController, oktaResult : @escaping ([String : Any]) -> Void) {
         oktaAppAuth?.signInWithBrowser(from: from) { authStateManager, error in
             if let error = error {
                 self.authStateManager = nil
