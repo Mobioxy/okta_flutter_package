@@ -38,10 +38,6 @@ class OktaFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
                 val configResult = oktaService.createOIDCConfig(context, config)
                 if (configResult) {
                     Log.d(oktaService.tag, "OktaService initialized")
-                    binding.addActivityResultListener { requestCode, resultCode, data ->
-                        oktaService.onActivityResult(requestCode, resultCode, data)
-                        true
-                    }
                     result.success(true)
                 } else {
                     result.success(false)
