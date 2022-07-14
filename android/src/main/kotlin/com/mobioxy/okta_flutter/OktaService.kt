@@ -76,10 +76,10 @@ class OktaService {
                     }
 
                     override fun onError(msg: String?, exception: AuthorizationException?) {
-                        Log.d(tag, "onError: $msg")
+                        Log.d(tag, "onError: ${exception?.message}")
 
                         response["authorizationStatus"] = AuthorizationStatus.ERROR.name
-                        response["message"] = msg
+                        response["message"] = "$msg : ${exception?.message}"
                         oktaResult.onResult(response)
                     }
                 }, activity
