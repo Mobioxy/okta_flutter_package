@@ -44,19 +44,21 @@ class _MyAppState extends State<MyApp> {
         appBar: AppBar(
           title: const Text('Plugin example app'),
         ),
-        body: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            ElevatedButton(
-              onPressed: _signIn,
-              child: const Text('Sign In'),
-            ),
-            const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: _signOut,
-              child: const Text('Sign Out'),
-            ),
-          ],
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              ElevatedButton(
+                onPressed: _signIn,
+                child: const Text('Sign In'),
+              ),
+              const SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: _signOut,
+                child: const Text('Sign Out'),
+              ),
+            ],
+          ),
         ),
       ),
     );

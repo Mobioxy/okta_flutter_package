@@ -5,6 +5,7 @@ import 'package:okta_flutter/src/okta_result.dart';
 export 'package:okta_flutter/src/authorization_status.dart';
 export 'package:okta_flutter/src/okta_config.dart';
 export 'package:okta_flutter/src/okta_result.dart';
+export 'package:okta_flutter/src/tokens.dart';
 
 class OktaFlutter {
   OktaFlutter._();

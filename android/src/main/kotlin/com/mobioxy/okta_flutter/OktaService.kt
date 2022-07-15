@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.util.Log
 import com.okta.oidc.*
+import com.okta.oidc.clients.sessions.SessionClient
 import com.okta.oidc.clients.web.WebAuthClient
 import com.okta.oidc.storage.SharedPreferenceStorage
 import com.okta.oidc.storage.security.DefaultEncryptionManager
@@ -12,10 +13,12 @@ import com.okta.oidc.util.AuthorizationException
 
 class OktaService {
 
+    var tag: String = this.javaClass.simpleName
+
     private var config: OIDCConfig? = null
     private var authClient: WebAuthClient? = null
+    private var sessionClient: SessionClient? = null
 
-    var tag: String = this.javaClass.simpleName
 
     interface OktaResultHandler {
         fun onResult(oktaResult: MutableMap<String, Any?>)
@@ -38,7 +41,9 @@ class OktaService {
                 .withEncryptionManager(DefaultEncryptionManager(context))
                 .setRequireHardwareBackedKeyStore(false)
                 .withCallbackExecutor(null)
-                .create();
+                .create()
+
+            sessionClient = authClient?.sessionClient
 
             return true
         } catch (e: Exception) {
@@ -57,10 +62,18 @@ class OktaService {
         authClient?.registerCallback(
             object : ResultCallback<AuthorizationStatus, AuthorizationException> {
                 override fun onSuccess(result: AuthorizationStatus) {
-                    Log.d(tag, "onSuccess: ${result.name}")
+                    val tokens = sessionClient?.tokens
 
+                    val oktaTokens: MutableMap<String, Any?> = HashMap()
+                    oktaTokens["idToken"] = tokens?.idToken
+                    oktaTokens["accessToken"] = tokens?.accessToken
+                    oktaTokens["refreshToken"] = tokens?.refreshToken
+                    oktaTokens["expiresIn"] = tokens?.expiresIn
+
+                    Log.d(tag, "onSuccess: ${result.name}")
                     response["authorizationStatus"] = result.name
                     response["message"] = "Success"
+                    response["tokens"] = oktaTokens
                     oktaResult.onResult(response)
                 }
 
