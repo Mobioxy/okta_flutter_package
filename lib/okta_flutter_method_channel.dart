@@ -33,4 +33,11 @@ class MethodChannelOktaFlutter extends OktaFlutterPlatform {
       return OktaResult.fromMap(Map<String, dynamic>.from(result));
     });
   }
+
+  @override
+  Future<OktaResult> refreshToken() {
+    return methodChannel.invokeMethod('refreshToken').then((result) {
+      return OktaResult.fromMap(Map<String, dynamic>.from(result));
+    });
+  }
 }

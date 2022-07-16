@@ -11,8 +11,9 @@ class OktaResult {
     return OktaResult(
       status: getAuthorizationStatus(result['authorizationStatus']),
       message: result['message'],
-      tokens:
-          result['tokens'] != null ? Tokens.fromMap(result['tokens']) : null,
+      tokens: result['tokens'] != null
+          ? Tokens.fromMap(Map.from(result['tokens']))
+          : null,
     );
   }
 

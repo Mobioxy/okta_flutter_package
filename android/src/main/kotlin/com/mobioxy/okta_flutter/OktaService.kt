@@ -62,6 +62,8 @@ class OktaService {
         authClient?.registerCallback(
             object : ResultCallback<AuthorizationStatus, AuthorizationException> {
                 override fun onSuccess(result: AuthorizationStatus) {
+                    Log.d(tag, "SignIn onSuccess: ${result.name}")
+
                     val tokens = sessionClient?.tokens
 
                     val oktaTokens: MutableMap<String, Any?> = HashMap()
@@ -70,7 +72,6 @@ class OktaService {
                     oktaTokens["refreshToken"] = tokens?.refreshToken
                     oktaTokens["expiresIn"] = tokens?.expiresIn
 
-                    Log.d(tag, "onSuccess: ${result.name}")
                     response["authorizationStatus"] = result.name
                     response["message"] = "Success"
                     response["tokens"] = oktaTokens
@@ -78,7 +79,7 @@ class OktaService {
                 }
 
                 override fun onCancel() {
-                    Log.d(tag, "onCancel")
+                    Log.d(tag, "SignIn onCancel")
 
                     response["authorizationStatus"] = AuthorizationStatus.CANCELED.name
                     response["message"] = "Cancelled by User"
@@ -86,7 +87,7 @@ class OktaService {
                 }
 
                 override fun onError(msg: String?, exception: AuthorizationException?) {
-                    Log.d(tag, "onError: ${exception?.message}")
+                    Log.d(tag, "SignIn onError: ${exception?.message}")
 
                     response["authorizationStatus"] = AuthorizationStatus.ERROR.name
                     response["message"] = "$msg : ${exception?.message}"
@@ -100,7 +101,7 @@ class OktaService {
         val response: MutableMap<String, Any?> = HashMap()
         authClient?.signOut(activity, object : RequestCallback<Int, AuthorizationException> {
             override fun onSuccess(result: Int) {
-                Log.d(tag, "onSuccess: $result")
+                Log.d(tag, "SignOut onSuccess: $result")
 
                 response["authorizationStatus"] = handleSignOutResult(result)
                 response["message"] = "Success"
@@ -108,7 +109,7 @@ class OktaService {
             }
 
             override fun onError(error: String?, exception: AuthorizationException?) {
-                Log.d(tag, "onError: ${exception?.message}")
+                Log.d(tag, "SignOut onError: ${exception?.message}")
 
                 response["authorizationStatus"] = AuthorizationStatus.ERROR.name
                 response["message"] = "$error : ${exception?.message}"
@@ -117,6 +118,36 @@ class OktaService {
 
         }
         )
+    }
+
+    fun refreshToken(oktaResult: OktaResultHandler) {
+
+        val response: MutableMap<String, Any?> = HashMap()
+
+        sessionClient?.refreshToken(object : RequestCallback<Tokens, AuthorizationException> {
+            override fun onSuccess(result: Tokens) {
+                Log.d(tag, "RefreshToken onSuccess: ${result.toString()}")
+
+                val oktaTokens: MutableMap<String, Any?> = HashMap()
+                oktaTokens["idToken"] = result.idToken
+                oktaTokens["accessToken"] = result.accessToken
+                oktaTokens["refreshToken"] = result.refreshToken
+                oktaTokens["expiresIn"] = result.expiresIn
+
+                response["authorizationStatus"] = "SUCCESS"
+                response["message"] = "Success"
+                response["tokens"] = oktaTokens
+                oktaResult.onResult(response)
+            }
+
+            override fun onError(error: String?, exception: AuthorizationException?) {
+                Log.d(tag, "RefreshToken onError: ${exception?.message}")
+
+                response["authorizationStatus"] = AuthorizationStatus.ERROR.name
+                response["message"] = "$error : ${exception?.message}"
+                oktaResult.onResult(response)
+            }
+        })
     }
 
     fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

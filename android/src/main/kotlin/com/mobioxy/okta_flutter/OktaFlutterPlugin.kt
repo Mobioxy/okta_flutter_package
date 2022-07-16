@@ -63,6 +63,14 @@ class OktaFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
                         }
                     })
             }
+            "refreshToken" -> {
+                oktaService.refreshToken(
+                    object : OktaService.OktaResultHandler {
+                        override fun onResult(oktaResult: MutableMap<String, Any?>) {
+                            result.success(oktaResult)
+                        }
+                    })
+            }
             else -> {
                 result.notImplemented()
             }

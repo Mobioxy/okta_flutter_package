@@ -10,6 +10,8 @@ export 'package:okta_flutter/src/tokens.dart';
 class OktaFlutter {
   OktaFlutter._();
 
+  bool _isInitialized = false;
+
   static final OktaFlutter _instance = OktaFlutter._();
 
   final OktaFlutterPlatform _platform = OktaFlutterPlatform.instance;
@@ -18,16 +20,25 @@ class OktaFlutter {
 
   /// Okta config information.
   /// This is used to setup a configuration for AuthClient and SessionClient clients.
-  /// 
+  ///
   Future<bool> createOIDCConfig(OktaConfig config) async {
     var result = await _platform.createOIDCConfig(config);
+    if (result ?? false) {
+      _isInitialized = true;
+    }
     return result ?? false;
   }
 
   /// Sign in using implicit flow.
   /// The result will be returned in the `OktaResult`
   ///
-  Future<OktaResult> signIn() => _platform.signIn();
+  Future<OktaResult> signIn() {
+    if (_isInitialized) {
+      return _platform.signIn();
+    } else {
+      throw Exception('Okta is not initialized');
+    }
+  }
 
   /// Convenience method to completely sign out of application.
   /// Performs the following operations in order: 1. Revokes the `access_token`.
@@ -39,5 +50,21 @@ class OktaFlutter {
   /// See Also:
   /// `SUCCESS`, `FAILED_REVOKE_ACCESS_TOKEN`, `FAILED_REVOKE_REFRESH_TOKEN`, `FAILED_CLEAR_DATA`, `FAILED_CLEAR_SESSION`
   ///
-  Future<OktaResult> signOut() => _platform.signOut();
+  Future<OktaResult> signOut() {
+    if (_isInitialized) {
+      return _platform.signOut();
+    } else {
+      throw Exception('Okta is not initialized');
+    }
+  }
+
+  /// Refresh token returns access, refresh, and ID tokens Tokens.
+  ///
+  Future<OktaResult> refreshToken() {
+    if (_isInitialized) {
+      return _platform.refreshToken();
+    } else {
+      throw Exception('Okta is not initialized');
+    }
+  }
 }
