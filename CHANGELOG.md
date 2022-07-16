@@ -10,4 +10,4 @@
 
 ## 1.0.0
 
-* TODO: Completed setup for both platfroms. (SignIn, SignOut, GetUserProfile, RefreshToken, isAuthenticated)
+* TODO: Completed setup for both platforms. (SignIn, SignOut, GetUserProfile, RefreshToken, isAuthenticated)
