@@ -73,7 +73,7 @@ class OktaService {
                     oktaTokens["expiresIn"] = tokens?.expiresIn
 
                     response["authorizationStatus"] = result.name
-                    response["message"] = "Success"
+                    response["message"] = "Sign In Successes"
                     response["tokens"] = oktaTokens
                     oktaResult.onResult(response)
                 }
@@ -104,7 +104,7 @@ class OktaService {
                 Log.d(tag, "SignOut onSuccess: $result")
 
                 response["authorizationStatus"] = handleSignOutResult(result)
-                response["message"] = "Success"
+                response["message"] = "Sign Out Successes"
                 oktaResult.onResult(response)
             }
 
@@ -135,7 +135,7 @@ class OktaService {
                 oktaTokens["expiresIn"] = result.expiresIn
 
                 response["authorizationStatus"] = "SUCCESS"
-                response["message"] = "Success"
+                response["message"] = "Token Refreshed"
                 response["tokens"] = oktaTokens
                 oktaResult.onResult(response)
             }

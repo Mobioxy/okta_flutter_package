@@ -4,7 +4,7 @@ import OktaOidc
 
 public class SwiftOktaFlutterPlugin: NSObject, FlutterPlugin {
     
-    private var oktaService: OktaService?
+    private var oktaService = OktaService()
     
     public static func register(with registrar: FlutterPluginRegistrar) {
         let channel = FlutterMethodChannel(name: "mobility.okta_flutter", binaryMessenger: registrar.messenger())
@@ -13,23 +13,35 @@ public class SwiftOktaFlutterPlugin: NSObject, FlutterPlugin {
     }
     
     public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
-        oktaService = OktaService()
+        let viewController = UIApplication.shared.keyWindow?.rootViewController ?? UIViewController()
+        
         if call.method == "createOIDCConfig" {
             
             if let arguments = call.arguments as? Dictionary<String, Any>{
                 let configuration = processOIDCConfigArguments(arguments: arguments)
-                oktaService?.createOIDCConfig(configuration: configuration)
+                let configResult =  oktaService.createOIDCConfig(configuration: configuration)
+                result(configResult.boolValue)
             }
             
         } else if call.method == "signIn" {
             
-            let viewController = UIApplication.shared.keyWindow?.rootViewController ?? UIViewController()
-            oktaService?.signIn(from: viewController) { oktaResult in
+            oktaService.signIn(from: viewController) { oktaResult in
                 result(oktaResult)
             }
             
+        } else if call.method == "signOut" {
             
-        }  else {
+            oktaService.signOut(from: viewController) { oktaResult in
+                result(oktaResult)
+            }
+            
+        } else if call.method == "refreshToken" {
+            
+            oktaService.refreshToken { oktaResult in
+                result(oktaResult)
+            }
+            
+        } else {
             result(FlutterMethodNotImplemented)
         }
     }

@@ -1,7 +1,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.mobioxy.okta_flutter_example">
+    package="com.example.example">
    <application
-        android:label="okta_flutter_example"
+        android:label="example"
+        android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
             android:name=".MainActivity"

@@ -50,6 +50,13 @@ enum AuthorizationStatus {
   /// Bitwise status returned when clearing data failed.
   ///
   failedClearSession,
+
+
+  /// iOS only
+  revokeAccessToken,
+  revokeRefreshToken,
+  signOutFromOkta,
+  removeTokensFromStorage,
 }
 
 AuthorizationStatus? getAuthorizationStatus(String status) {
@@ -67,6 +74,10 @@ AuthorizationStatus? getAuthorizationStatus(String status) {
     'FAILED_REVOKE_REFRESH_TOKEN': AuthorizationStatus.failedRevokeRefreshToken,
     'FAILED_CLEAR_DATA': AuthorizationStatus.failedClearData,
     'FAILED_CLEAR_SESSION': AuthorizationStatus.failedClearSession,
+    'REVOKE_ACCESS_TOKEN': AuthorizationStatus.revokeAccessToken,
+    'REVOKE_REFRESH_TOKEN': AuthorizationStatus.revokeRefreshToken,
+    'SIGN_OUT_FROM_OKTA': AuthorizationStatus.signOutFromOkta,
+    'REMOVE_TOKENS_FROM_STORAGE': AuthorizationStatus.removeTokensFromStorage,
   };
   return authorizationStatus[status];
 }
