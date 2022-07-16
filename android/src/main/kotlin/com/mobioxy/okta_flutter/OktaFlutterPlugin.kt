@@ -71,6 +71,14 @@ class OktaFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
                         }
                     })
             }
+            "getUserProfile" -> {
+                oktaService.getUserProfile(
+                    object : OktaService.OktaUserProfileHandler {
+                        override fun onResult(oktaResult: MutableMap<String, Any?>) {
+                            result.success(oktaResult)
+                        }
+                    })
+            }
             else -> {
                 result.notImplemented()
             }

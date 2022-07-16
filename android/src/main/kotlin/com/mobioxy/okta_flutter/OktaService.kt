@@ -7,6 +7,7 @@ import android.util.Log
 import com.okta.oidc.*
 import com.okta.oidc.clients.sessions.SessionClient
 import com.okta.oidc.clients.web.WebAuthClient
+import com.okta.oidc.net.response.UserInfo
 import com.okta.oidc.storage.SharedPreferenceStorage
 import com.okta.oidc.storage.security.DefaultEncryptionManager
 import com.okta.oidc.util.AuthorizationException
@@ -21,6 +22,10 @@ class OktaService {
 
 
     interface OktaResultHandler {
+        fun onResult(oktaResult: MutableMap<String, Any?>)
+    }
+
+    interface OktaUserProfileHandler {
         fun onResult(oktaResult: MutableMap<String, Any?>)
     }
 
@@ -103,7 +108,7 @@ class OktaService {
             override fun onSuccess(result: Int) {
                 Log.d(tag, "SignOut onSuccess: $result")
 
-                response["authorizationStatus"] = handleSignOutResult(result)
+                response["authorizationStatus"] = "SIGNED_OUT"
                 response["message"] = "Sign Out Successes"
                 oktaResult.onResult(response)
             }
@@ -121,12 +126,11 @@ class OktaService {
     }
 
     fun refreshToken(oktaResult: OktaResultHandler) {
-
         val response: MutableMap<String, Any?> = HashMap()
 
         sessionClient?.refreshToken(object : RequestCallback<Tokens, AuthorizationException> {
             override fun onSuccess(result: Tokens) {
-                Log.d(tag, "RefreshToken onSuccess: ${result.toString()}")
+                Log.d(tag, "RefreshToken onSuccess: $result")
 
                 val oktaTokens: MutableMap<String, Any?> = HashMap()
                 oktaTokens["idToken"] = result.idToken
@@ -144,34 +148,34 @@ class OktaService {
                 Log.d(tag, "RefreshToken onError: ${exception?.message}")
 
                 response["authorizationStatus"] = AuthorizationStatus.ERROR.name
-                response["message"] = "$error : ${exception?.message}"
+                response["message"] = exception?.message
                 oktaResult.onResult(response)
+            }
+        })
+    }
+
+    fun getUserProfile(userProfileResult : OktaUserProfileHandler){
+        val response: MutableMap<String, Any?> = HashMap()
+        sessionClient?.getUserProfile(object : RequestCallback<UserInfo, AuthorizationException> {
+            override fun onSuccess(result: UserInfo) {
+                Log.d(tag, "GetUserProfile onSuccess: $result")
+
+                response["isSuccess"] = true
+                response["message"] = "UserProfile Fetched"
+                response["userProfile"] = result.toString()
+                userProfileResult.onResult(response)
+            }
+
+            override fun onError(error: String?, exception: AuthorizationException?) {
+                Log.d(tag, "GetUserProfile onError: ${exception?.message}")
+                response["isSuccess"] = false
+                response["message"] = exception?.message
+                userProfileResult.onResult(response)
             }
         })
     }
 
     fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         authClient?.handleActivityResult(requestCode, resultCode, data)
-    }
-
-    private fun handleSignOutResult(result: Int): String {
-        return when (result) {
-            0x00000000 -> {
-                "SUCCESS"
-            }
-            0x00000001 -> {
-                "FAILED_REVOKE_ACCESS_TOKEN"
-            }
-            0x00000002 -> {
-                "FAILED_REVOKE_REFRESH_TOKEN"
-            }
-            0x00000004 -> {
-                "FAILED_CLEAR_DATA"
-            }
-            0x00000008 -> {
-                "FAILED_CLEAR_SESSION"
-            }
-            else -> AuthorizationStatus.ERROR.name
-        }
     }
 }

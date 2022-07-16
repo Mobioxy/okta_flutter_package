@@ -52,7 +52,6 @@ enum AuthorizationStatus {
   failedClearSession,
 
 
-  /// iOS only
   revokeAccessToken,
   revokeRefreshToken,
   signOutFromOkta,

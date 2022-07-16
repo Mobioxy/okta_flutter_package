@@ -1,9 +1,11 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:okta_flutter/src/okta_config.dart';
 import 'package:okta_flutter/src/okta_result.dart';
+import 'package:okta_flutter/src/user_profile.dart';
 
 import 'okta_flutter_platform_interface.dart';
 
@@ -39,5 +41,20 @@ class MethodChannelOktaFlutter extends OktaFlutterPlatform {
     return methodChannel.invokeMethod('refreshToken').then((result) {
       return OktaResult.fromMap(Map<String, dynamic>.from(result));
     });
+  }
+
+  @override
+  Future<UserProfile?> getUserProfile() async {
+    var result = await methodChannel.invokeMethod('getUserProfile');
+    if (result != null) {
+      if (result['isSuccess']) {
+        var decodedUserProfile = jsonDecode(result['userProfile']);
+        return UserProfile.fromMap(decodedUserProfile);
+      } else {
+        throw PlatformException(code: 'ERROR', message: result['message']);
+      }
+    } else {
+      throw Exception('getUserProfile() failed');
+    }
   }
 }

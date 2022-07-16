@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
@@ -15,9 +16,38 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
+  //
+  bool _isInitialized = false;
+  String? _userProfile;
   final OktaFlutter _okta = OktaFlutter.instance;
 
   Future<void> _signIn() async {
+    if (_isInitialized) {
+      var result = await _okta.signIn();
+      log('SignIn Result: ${result.toString()}');
+    }
+  }
+
+  Future<void> _signOut() async {
+    var result = await _okta.signOut();
+    log('SignOut Result: ${result.toString()}');
+  }
+
+  Future<void> _refreshToken() async {
+    var result = await _okta.refreshToken();
+    log('RefreshToken Result: ${result.toString()}');
+  }
+
+  Future<void> _getUserProfile() async {
+    var user = await _okta.getUserProfile();
+    log('UserProfile Result: ${user?.toMap()}');
+
+    setState(() {
+      _userProfile = jsonEncode(user?.toMap());
+    });
+  }
+
+  Future<void> initOktaService() async {
     // var config = OktaConfig(
     //   clientId: 'YOUR CLINET ID',
     //   discoveryUri: 'YOUR DISCOVERY URI',
@@ -32,22 +62,14 @@ class _MyAppState extends State<MyApp> {
       endSessionRedirectUri: 'com.okta.dev-03370337:/',
       scopes: ['openid', 'profile', 'email'],
     );
-
     var status = await _okta.createOIDCConfig(config);
-    if (status) {
-      var result = await _okta.signIn();
-      log('SignIn Result: ${result.toString()}');
-    }
+    _isInitialized = status;
   }
 
-  Future<void> _signOut() async {
-    var result = await _okta.signOut();
-    log('SignOut Result: ${result.toString()}');
-  }
-
-  Future<void> _refreshToken() async {
-    var result = await _okta.signOut();
-    log('RefreshToken Result: ${result.toString()}');
+  @override
+  void initState() {
+    super.initState();
+    initOktaService();
   }
 
   @override
@@ -57,25 +79,40 @@ class _MyAppState extends State<MyApp> {
         appBar: AppBar(
           title: const Text('Plugin example app'),
         ),
-        body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              ElevatedButton(
-                onPressed: _signIn,
-                child: const Text('Sign In'),
-              ),
-              const SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: _signOut,
-                child: const Text('Sign Out'),
-              ),
-              const SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: _refreshToken,
-                child: const Text('Refresh Token'),
-              ),
-            ],
+        body: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                ElevatedButton(
+                  onPressed: _signIn,
+                  child: const Text('Sign In'),
+                ),
+                const SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: _signOut,
+                  child: const Text('Sign Out'),
+                ),
+                const SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: _refreshToken,
+                  child: const Text('Refresh Token'),
+                ),
+                const SizedBox(height: 20),
+                if (_userProfile != null)
+                  Text(
+                    _userProfile ?? '',
+                    textAlign: TextAlign.center,
+                  ),
+                if (_userProfile != null) const SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: _getUserProfile,
+                  child: const Text('Get User Profile'),
+                ),
+              ],
+            ),
           ),
         ),
       ),

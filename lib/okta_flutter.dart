@@ -1,11 +1,13 @@
 import 'package:okta_flutter/okta_flutter_platform_interface.dart';
 import 'package:okta_flutter/src/okta_config.dart';
 import 'package:okta_flutter/src/okta_result.dart';
+import 'package:okta_flutter/src/user_profile.dart';
 
 export 'package:okta_flutter/src/authorization_status.dart';
 export 'package:okta_flutter/src/okta_config.dart';
 export 'package:okta_flutter/src/okta_result.dart';
 export 'package:okta_flutter/src/tokens.dart';
+export 'package:okta_flutter/src/user_profile.dart';
 
 class OktaFlutter {
   OktaFlutter._();
@@ -63,6 +65,17 @@ class OktaFlutter {
   Future<OktaResult> refreshToken() {
     if (_isInitialized) {
       return _platform.refreshToken();
+    } else {
+      throw Exception('Okta is not initialized');
+    }
+  }
+
+  /// Get user profile returns any claims for the currently logged-in user.
+  /// This must be done after the user is logged-in (client has a valid access token).
+  ///
+  Future<UserProfile?> getUserProfile() {
+    if (_isInitialized) {
+      return _platform.getUserProfile();
     } else {
       throw Exception('Okta is not initialized');
     }
