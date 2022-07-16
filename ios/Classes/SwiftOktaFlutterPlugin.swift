@@ -23,6 +23,12 @@ public class SwiftOktaFlutterPlugin: NSObject, FlutterPlugin {
                 result(configResult.boolValue)
             }
             
+        } else if call.method == "isAuthenticated" {
+            
+            let isAuthenticated = oktaService.isAuthenticated()
+            result(isAuthenticated)
+            
+            
         } else if call.method == "signIn" {
             
             oktaService.signIn(from: viewController) { oktaResult in
@@ -38,6 +44,12 @@ public class SwiftOktaFlutterPlugin: NSObject, FlutterPlugin {
         } else if call.method == "refreshToken" {
             
             oktaService.refreshToken { oktaResult in
+                result(oktaResult)
+            }
+            
+        } else if call.method == "getUserProfile" {
+            
+            oktaService.getUserProfile { oktaResult in
                 result(oktaResult)
             }
             

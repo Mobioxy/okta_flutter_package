@@ -48,13 +48,25 @@ class MethodChannelOktaFlutter extends OktaFlutterPlatform {
     var result = await methodChannel.invokeMethod('getUserProfile');
     if (result != null) {
       if (result['isSuccess']) {
-        var decodedUserProfile = jsonDecode(result['userProfile']);
-        return UserProfile.fromMap(decodedUserProfile);
+        if (Platform.isAndroid) {
+          var decodedUserProfile = jsonDecode(result['userProfile']);
+          return UserProfile.fromMap(decodedUserProfile);
+        } else {
+          return UserProfile.fromMap(
+              Map<String, dynamic>.from(result['userProfile']));
+        }
       } else {
         throw PlatformException(code: 'ERROR', message: result['message']);
       }
     } else {
       throw Exception('getUserProfile() failed');
     }
+  }
+
+  @override
+  Future<bool> isAuthenticated() async {
+    var isAuthenticated =
+        await methodChannel.invokeMethod<bool>('isAuthenticated');
+    return isAuthenticated ?? false;
   }
 }

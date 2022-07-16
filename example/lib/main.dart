@@ -1,6 +1,3 @@
-import 'dart:convert';
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:okta_flutter/okta_flutter.dart';
 
@@ -8,114 +5,158 @@ void main() {
   runApp(const MyApp());
 }
 
-class MyApp extends StatefulWidget {
+class MyApp extends StatelessWidget {
   const MyApp({Key? key}) : super(key: key);
 
   @override
-  State<MyApp> createState() => _MyAppState();
+  Widget build(BuildContext context) {
+    return const MaterialApp(home: MyHomePage());
+  }
 }
 
-class _MyAppState extends State<MyApp> {
+class MyHomePage extends StatefulWidget {
+  const MyHomePage({Key? key}) : super(key: key);
+
+  @override
+  State<MyHomePage> createState() => _MyHomePageState();
+}
+
+class _MyHomePageState extends State<MyHomePage> {
   //
   bool _isInitialized = false;
-  String? _userProfile;
+  UserProfile? _userProfile;
   final OktaFlutter _okta = OktaFlutter.instance;
 
   Future<void> _signIn() async {
     if (_isInitialized) {
       var result = await _okta.signIn();
-      log('SignIn Result: ${result.toString()}');
+      if (result.status == AuthorizationStatus.authorized) {
+        _getUserProfile();
+      } else {
+        _showSnackBar(result.message ?? 'Unknown error');
+      }
     }
   }
 
   Future<void> _signOut() async {
     var result = await _okta.signOut();
-    log('SignOut Result: ${result.toString()}');
+    _showSnackBar(result.message ?? 'Unknown error');
+    setState(() {
+      _userProfile = null;
+    });
   }
 
   Future<void> _refreshToken() async {
     var result = await _okta.refreshToken();
-    log('RefreshToken Result: ${result.toString()}');
+    _showSnackBar(result.message ?? 'Unknown error');
   }
 
   Future<void> _getUserProfile() async {
-    var user = await _okta.getUserProfile();
-    log('UserProfile Result: ${user?.toMap()}');
-
+    var userProfile = await _okta.getUserProfile();
     setState(() {
-      _userProfile = jsonEncode(user?.toMap());
+      _userProfile = userProfile;
     });
   }
 
-  Future<void> initOktaService() async {
-    // var config = OktaConfig(
-    //   clientId: 'YOUR CLINET ID',
-    //   discoveryUri: 'YOUR DISCOVERY URI',
-    //   redirectUri: 'YOUR REDIRECT URI',
-    //   endSessionRedirectUri: 'YOUR END SESSION REDIRECT URI',
-    //   scopes: ['openid', 'profile', 'email'],
-    // );
+  Future<void> _initOktaService() async {
     var config = OktaConfig(
-      clientId: '0oa5r05zy5BV26wcQ5d7',
-      discoveryUri: 'https://dev-03370337-admin.okta.com:/oauth2/default',
-      redirectUri: 'com.okta.dev-03370337:/callback',
-      endSessionRedirectUri: 'com.okta.dev-03370337:/',
+      clientId: 'YOUR CLINET ID',
+      discoveryUri: 'YOUR DISCOVERY URI',
+      redirectUri: 'YOUR REDIRECT URI',
+      endSessionRedirectUri: 'YOUR END SESSION REDIRECT URI',
       scopes: ['openid', 'profile', 'email'],
     );
+
     var status = await _okta.createOIDCConfig(config);
-    _isInitialized = status;
+    if (status) {
+      setState(() {
+        _isInitialized = status;
+      });
+    } else {
+      _showSnackBar('OktaService initialization failed');
+    }
   }
 
   @override
   void initState() {
     super.initState();
-    initOktaService();
+    _initOktaService();
   }
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Scaffold(
-        appBar: AppBar(
-          title: const Text('Plugin example app'),
-        ),
-        body: Padding(
-          padding: const EdgeInsets.all(20),
-          child: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                ElevatedButton(
-                  onPressed: _signIn,
-                  child: const Text('Sign In'),
-                ),
-                const SizedBox(height: 20),
-                ElevatedButton(
-                  onPressed: _signOut,
-                  child: const Text('Sign Out'),
-                ),
-                const SizedBox(height: 20),
-                ElevatedButton(
-                  onPressed: _refreshToken,
-                  child: const Text('Refresh Token'),
-                ),
-                const SizedBox(height: 20),
-                if (_userProfile != null)
-                  Text(
-                    _userProfile ?? '',
-                    textAlign: TextAlign.center,
-                  ),
-                if (_userProfile != null) const SizedBox(height: 20),
-                ElevatedButton(
-                  onPressed: _getUserProfile,
-                  child: const Text('Get User Profile'),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
+    return Scaffold(
+      appBar: AppBar(title: const Text('Plugin example app')),
+      body: _isInitialized
+          ? Padding(
+              padding: const EdgeInsets.all(20),
+              child: FutureBuilder<bool>(
+                future: _okta.isAuthenticated(),
+                builder: (context, snapshot) {
+                  if (snapshot.hasData) {
+                    var isAuthenticated = snapshot.data ?? false;
+                    if (isAuthenticated) {
+                      return SingleChildScrollView(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            if (_userProfile != null)
+                              Column(
+                                children: List.generate(
+                                  _userProfile?.toMap().length ?? 0,
+                                  (index) {
+                                    var detail = _userProfile
+                                        ?.toMap()
+                                        .entries
+                                        .elementAt(index);
+                                    return ListTile(
+                                      contentPadding: EdgeInsets.zero,
+                                      title: Text(detail?.key ?? ''),
+                                      trailing:
+                                          Text(detail?.value.toString() ?? ''),
+                                    );
+                                  },
+                                ),
+                              ),
+                            const SizedBox(height: 20),
+                            ElevatedButton(
+                              onPressed: _signOut,
+                              child: const Text('Sign Out'),
+                            ),
+                            const SizedBox(height: 10),
+                            ElevatedButton(
+                              onPressed: _refreshToken,
+                              child: const Text('Refresh Token'),
+                            ),
+                          ],
+                        ),
+                      );
+                    } else {
+                      return Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          ElevatedButton(
+                            onPressed: _signIn,
+                            child: const Text('Sign In'),
+                          ),
+                        ],
+                      );
+                    }
+                  } else {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+                },
+              ),
+            )
+          : const Center(child: CircularProgressIndicator()),
+    );
+  }
+
+  void _showSnackBar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message)),
     );
   }
 }

@@ -33,4 +33,6 @@ abstract class OktaFlutterPlatform extends PlatformInterface {
   Future<OktaResult> refreshToken();
 
   Future<UserProfile?> getUserProfile();
+
+  Future<bool> isAuthenticated();
 }

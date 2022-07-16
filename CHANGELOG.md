@@ -6,3 +6,8 @@
 ## 0.0.3
 
 * TODO: Okata sign out for android.
+
+
+## 1.0.0
+
+* TODO: Completed setup for both platfroms. (SignIn, SignOut, GetUserProfile, RefreshToken, isAuthenticated)

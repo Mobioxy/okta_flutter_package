@@ -25,10 +25,6 @@ class OktaService {
         fun onResult(oktaResult: MutableMap<String, Any?>)
     }
 
-    interface OktaUserProfileHandler {
-        fun onResult(oktaResult: MutableMap<String, Any?>)
-    }
-
     fun createOIDCConfig(context: Context, baseConfig: BaseConfig): Boolean {
         try {
             config = OIDCConfig.Builder()
@@ -107,7 +103,7 @@ class OktaService {
         authClient?.signOut(activity, object : RequestCallback<Int, AuthorizationException> {
             override fun onSuccess(result: Int) {
                 Log.d(tag, "SignOut onSuccess: $result")
-
+                sessionClient?.clear()
                 response["authorizationStatus"] = "SIGNED_OUT"
                 response["message"] = "Sign Out Successes"
                 oktaResult.onResult(response)
@@ -154,7 +150,7 @@ class OktaService {
         })
     }
 
-    fun getUserProfile(userProfileResult : OktaUserProfileHandler){
+    fun getUserProfile(oktaResult: OktaResultHandler) {
         val response: MutableMap<String, Any?> = HashMap()
         sessionClient?.getUserProfile(object : RequestCallback<UserInfo, AuthorizationException> {
             override fun onSuccess(result: UserInfo) {
@@ -163,16 +159,23 @@ class OktaService {
                 response["isSuccess"] = true
                 response["message"] = "UserProfile Fetched"
                 response["userProfile"] = result.toString()
-                userProfileResult.onResult(response)
+                oktaResult.onResult(response)
             }
 
             override fun onError(error: String?, exception: AuthorizationException?) {
                 Log.d(tag, "GetUserProfile onError: ${exception?.message}")
                 response["isSuccess"] = false
                 response["message"] = exception?.message
-                userProfileResult.onResult(response)
+                oktaResult.onResult(response)
             }
         })
+    }
+
+    fun isAuthenticated() : Boolean {
+        if (sessionClient != null) {
+            return sessionClient?.isAuthenticated ?: false
+        }
+        return false
     }
 
     fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

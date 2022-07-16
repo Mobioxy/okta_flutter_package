@@ -80,4 +80,16 @@ class OktaFlutter {
       throw Exception('Okta is not initialized');
     }
   }
+
+  /// Checks to see if the user is authenticated.
+  /// If the client have a access or ID token then the user is considered authenticated and this call will return true.
+  /// This does not check the validity of the access token which could be expired or revoked.
+  /// 
+  Future<bool> isAuthenticated() {
+    if (_isInitialized) {
+      return _platform.isAuthenticated();
+    } else {
+      throw Exception('Okta is not initialized');
+    }
+  }
 }

@@ -65,6 +65,7 @@ public class OktaService : NSObject {
             response["authorizationStatus"] = self.getSignOutStatus(option: failedOptions)
             
             if (success){
+                self.clear()
                 response["message"] = "Sign Out Successes"
             } else {
                 response["message"] = "Sign Out Failed"
@@ -98,6 +99,49 @@ public class OktaService : NSObject {
         })
     }
     
+    func getUserProfile(oktaResult : @escaping ([String : Any]) -> Void){
+        var response = [String : Any]()
+        var userProfile = [String : Any]()
+        
+        stateManager?.getUser { result, error in
+            if let error = error {
+                response["isSuccess"] = false
+                response["message"] = error.localizedDescription
+                return oktaResult(response)
+            }
+            
+            result?.forEach({(key: String, value: Any) in
+                if  userProfile[key] as? String == "email_verified" {
+                    userProfile[key] = (value as? Int == 1) ? true : false
+                } else {
+                    userProfile[key] = value
+                }
+            })
+            
+            print("GetUserProfile onSuccess: \(userProfile)")
+            response["isSuccess"] = true
+            response["message"] = "UserProfile Fetched"
+            response["userProfile"] = userProfile
+            return oktaResult(response)
+        }
+    }
+    
+    func isAuthenticated() -> Bool {
+        if stateManager != nil {
+            return stateManager?.authState.isAuthorized ?? false
+        }
+        return false
+        
+    }
+    
+    func clear(){
+        do {
+            try self.stateManager?.removeFromSecureStorage()
+        } catch let error {
+            print("Failed: \(error.localizedDescription)")
+        }
+    }
+    
     func getAuthorizationStatus(authState: OKTAuthState?) -> String {
         if (authState!.isAuthorized){
             return "AUTHORIZED"
@@ -105,6 +149,7 @@ public class OktaService : NSObject {
             return "ERROR"
         }
     }
+    
     
     func getSignOutStatus(option: OktaSignOutOptions) -> String {
         if option.contains(.revokeAccessToken) {
@@ -116,7 +161,7 @@ public class OktaService : NSObject {
         } else if option.contains(.removeTokensFromStorage){
             return "REMOVE_TOKENS_FROM_STORAGE"
         } else {
-            return  "ERROR"
+            return "ERROR"
         }
     }
     
