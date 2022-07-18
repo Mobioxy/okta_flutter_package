@@ -1,5 +1,3 @@
-## 0.0.3
+## 0.0.4
 
-
-* TODO: Completed setup for both platforms. (SignIn, SignOut, GetUserProfile, RefreshToken, isAuthenticated)
-
+- TODO: Completed setup for both platforms. (SignIn, SignOut, GetUserProfile, RefreshToken, isAuthenticated)
