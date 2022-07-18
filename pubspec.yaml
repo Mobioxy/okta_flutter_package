@@ -1,6 +1,6 @@
 name: okta_flutter
 description: Okta Flutter package makes it easy to add authentication to flutter apps. This library is a wrapper around Okta OIDC Android and Okta OIDC iOS.
-version: 1.0.0
+version: 0.0.2
 homepage: https://github.com/Mobioxy/okta_flutter_package
 
 environment:
