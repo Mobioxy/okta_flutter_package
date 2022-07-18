@@ -1,3 +1,5 @@
 ## 0.0.3
 
-- TODO: add signIn, signOut, refreshToken fun from iOS side.
+
+* TODO: Completed setup for both platforms. (SignIn, SignOut, GetUserProfile, RefreshToken, isAuthenticated)
+
