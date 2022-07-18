@@ -1,5 +1,4 @@
-import 'package:okta_flutter/src/okta_config.dart';
-import 'package:okta_flutter/src/okta_result.dart';
+import 'package:okta_flutter/okta_flutter.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 
 import 'okta_flutter_method_channel.dart';
@@ -30,4 +29,10 @@ abstract class OktaFlutterPlatform extends PlatformInterface {
   Future<OktaResult> signIn();
 
   Future<OktaResult> signOut();
+
+  Future<OktaResult> refreshToken();
+
+  Future<UserProfile?> getUserProfile();
+
+  Future<bool> isAuthenticated();
 }

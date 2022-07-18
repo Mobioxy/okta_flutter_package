@@ -47,6 +47,10 @@ class OktaFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
                     result.success(false)
                 }
             }
+            "isAuthenticated" -> {
+                val isAuthenticated = oktaService.isAuthenticated()
+                result.success(isAuthenticated)
+            }
             "signIn" -> {
                 oktaService.signIn(binding.activity,
                     object : OktaService.OktaResultHandler {
@@ -57,6 +61,22 @@ class OktaFlutterPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
             }
             "signOut" -> {
                 oktaService.signOut(binding.activity,
+                    object : OktaService.OktaResultHandler {
+                        override fun onResult(oktaResult: MutableMap<String, Any?>) {
+                            result.success(oktaResult)
+                        }
+                    })
+            }
+            "refreshToken" -> {
+                oktaService.refreshToken(
+                    object : OktaService.OktaResultHandler {
+                        override fun onResult(oktaResult: MutableMap<String, Any?>) {
+                            result.success(oktaResult)
+                        }
+                    })
+            }
+            "getUserProfile" -> {
+                oktaService.getUserProfile(
                     object : OktaService.OktaResultHandler {
                         override fun onResult(oktaResult: MutableMap<String, Any?>) {
                             result.success(oktaResult)

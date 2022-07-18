@@ -13,22 +13,47 @@ public class SwiftOktaFlutterPlugin: NSObject, FlutterPlugin {
     }
     
     public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
+        let viewController = UIApplication.shared.keyWindow?.rootViewController ?? UIViewController()
+        
         if call.method == "createOIDCConfig" {
             
             if let arguments = call.arguments as? Dictionary<String, Any>{
                 let configuration = processOIDCConfigArguments(arguments: arguments)
-                oktaService.createOIDCConfig(configuration: configuration)
+                let configResult =  oktaService.createOIDCConfig(configuration: configuration)
+                result(configResult.boolValue)
             }
+            
+        } else if call.method == "isAuthenticated" {
+            
+            let isAuthenticated = oktaService.isAuthenticated()
+            result(isAuthenticated)
+            
             
         } else if call.method == "signIn" {
             
-            let viewController = UIApplication.shared.keyWindow?.rootViewController ?? UIViewController()
             oktaService.signIn(from: viewController) { oktaResult in
                 result(oktaResult)
             }
             
+        } else if call.method == "signOut" {
             
-        }  else {
+            oktaService.signOut(from: viewController) { oktaResult in
+                result(oktaResult)
+            }
+            
+        } else if call.method == "refreshToken" {
+            
+            oktaService.refreshToken { oktaResult in
+                result(oktaResult)
+            }
+            
+        } else if call.method == "getUserProfile" {
+            
+            oktaService.getUserProfile { oktaResult in
+                result(oktaResult)
+            }
+            
+        } else {
             result(FlutterMethodNotImplemented)
         }
     }

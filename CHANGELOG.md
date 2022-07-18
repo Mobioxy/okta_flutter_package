@@ -1,3 +1,5 @@
-## 0.0.2
+## 0.0.3
 
-- TODO: Okta sign in auth added.
+
+* TODO: Completed setup for both platforms. (SignIn, SignOut, GetUserProfile, RefreshToken, isAuthenticated)
+
