@@ -4,7 +4,7 @@ import OktaOidc
 
 public class SwiftOktaFlutterPlugin: NSObject, FlutterPlugin {
     
-    private var oktaService = OktaService()
+    
     
     public static func register(with registrar: FlutterPluginRegistrar) {
         let channel = FlutterMethodChannel(name: "mobility.okta_flutter", binaryMessenger: registrar.messenger())
@@ -13,6 +13,7 @@ public class SwiftOktaFlutterPlugin: NSObject, FlutterPlugin {
     }
     
     public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
+        var oktaService = OktaService()
         if call.method == "createOIDCConfig" {
             
             if let arguments = call.arguments as? Dictionary<String, Any>{

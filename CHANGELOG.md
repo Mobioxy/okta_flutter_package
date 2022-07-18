@@ -1,3 +1,3 @@
-## 0.0.2
+## 0.0.3
 
-- TODO: Okta sign in auth added.
+- TODO: add signIn, signOut, refreshToken fun from iOS side.
